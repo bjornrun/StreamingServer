@@ -23,8 +23,16 @@
  * Maximum packet size, normally much less.
  */
 #define RECV_PORT  4343
+#define MAX_ID   1000
+#define OK_COOKIE 0x2938
 
+BufEntry buf[MAX_ID];
 
+void add2buf(int id, char* packet, int len)
+{
+    int next_head = (buf[id].head + 1) % MAX_BUFS;
+
+}
 
 void * input_thread(void *arg) {
     const int header_size = sizeof(int);
@@ -41,6 +49,16 @@ void * input_thread(void *arg) {
     while (1) {
         int packet_len = recv_msg(receiver, packet, PACKET_SIZE, 1);
 
+        Header* hdr = (Header*)  packet;
+
+        int cookie = ntohs(hdr->cookie);
+        int id = ntohs(hdr->id);
+
+        printf("Got packet (cookie=%d, id=%d, len=%d)\n", cookie, id, packet_len);
+
+        if (cookie == OK_COOKIE && id >= 0 && id < MAX_ID) {
+
+        }
 
         int addr = recv_get_addr(receiver);
          {
@@ -48,7 +66,7 @@ void * input_thread(void *arg) {
 
                 c_addr = inet_ntoa(receiver->addr.sin_addr);
 
-                fprintf(stderr, "creating new peer %s\n", c_addr);
+                fprintf(stderr, "from %s\n", c_addr);
 
 
 
