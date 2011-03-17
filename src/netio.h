@@ -9,12 +9,12 @@
  * Sender structure, used by send_* functions.
  */
 typedef struct {
-  /** File descriptor */
-  int fd;
-  /** Port */
-  int port;
-  /** Socket address */
-  struct sockaddr_in addr;
+    /** File descriptor */
+    int fd;
+    /** Port */
+    int port;
+    /** Socket address */
+    struct sockaddr_in addr;
 } msend_t;
 
 /**
@@ -29,7 +29,7 @@ typedef struct {
   struct sockaddr_in addr;
 } mrecv_t;
 
-msend_t* send_open(int port, const char *dest);
+msend_t* send_open(int port);
 int send_msg(msend_t *t, const void *buf, size_t len);
 int send_msg_to(msend_t *m, const void *buf, size_t len, struct sockaddr_in *dest);
 mrecv_t* recv_open(int port);
@@ -39,5 +39,7 @@ int recv_get_addr(mrecv_t *m);
 struct sockaddr_in getownaddr(const char *ifname);
 void getownip(unsigned char *buf);
 unsigned int addr_for(const char *cp);
+
+int recv_send_msg(msend_t *m, void *buf, size_t len, char wait);
 
 #endif /* _NETIO_H */
