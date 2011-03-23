@@ -116,8 +116,6 @@ int SendBuf(int id, long seq, int sock)
 				pthread_mutex_unlock(&session[id].mutex);
 
 				printf("session[id].seq[next] == seq\n");
-				for (int i = 0; i < session[id].len[next]; i++) printf("%02X ", session[id].buf[next][i]);
-				printf("\n");
 				
 				r.response = htons(E_R_BUF);
 				r.len = htons(session[id].len[next]);
@@ -225,6 +223,7 @@ void* handle_tcp_client(void * arg)
 				buffer = NULL;
 			} else 
 			if ((Cmds) hdr.cmd == E_GET) {
+				printf("E_GET\n");
 				if (buffer) {
 					free(buffer);
 					buffer = NULL;
@@ -235,6 +234,7 @@ void* handle_tcp_client(void * arg)
 				if (hdr.len != sizeof(BUF_Status)) {
 					printf("hdr.len != sizeof(BUF_Status)\n");
 				} else {
+					printf("E_STATUS\n");
 					BUF_Status* status = (BUF_Status*) buffer;
 					session[hdr.id].alert = ntohs(status->alert);
 					session[hdr.id].last_access = time(NULL);
@@ -247,6 +247,7 @@ void* handle_tcp_client(void * arg)
 			if ((Cmds) hdr.cmd == E_CHECK) {
 				Response r;
 				BUF_R_Check c;
+				printf("E_CHECK\n");
 				time_t now = time(NULL);
 				r.response = htons(E_R_CHECK);
 				r.len = htons(sizeof(BUF_R_Check));
@@ -260,6 +261,7 @@ void* handle_tcp_client(void * arg)
 				Response r;
 				BUF_R_Create_Login c;
 				time_t now = time(NULL);
+				printf("E_CREATE\n");
 				
 				if (hdr.len != sizeof(BUF_Create_Login)) {
 					printf("hdr.len != sizeof(BUF_Create_Login)\n");
@@ -327,6 +329,7 @@ void* handle_tcp_client(void * arg)
 			if ((Cmds) hdr.cmd == E_LOGIN) {
 				Response r;
 				BUF_R_Create_Login c;
+				printf("E_LOGIN");
 				if (hdr.len != sizeof(BUF_Create_Login)) {
 					printf("hdr.len != sizeof(BUF_Create_Login)\n");
 				} else {
@@ -337,6 +340,7 @@ void* handle_tcp_client(void * arg)
 					strncpy(password, status->password, MAX_NAME_LEN);
 					username[MAX_NAME_LEN-1] = 0;
 					password[MAX_NAME_LEN-1] = 0;
+					printf("username=%s, password=%d\n", username, password);
 					bool done = false;
 					Response r;
 					BUF_R_Create_Login c;
@@ -352,8 +356,14 @@ void* handle_tcp_client(void * arg)
 								c.cookie = htons(users[i].cookie);
 								printf("found login\n");
 								break;
+							} else {
+								printf("username ok password not=%s\n", users[i].password);
 							}
+
+						} else {
+							printf("not username=%s\n", users[i].username);
 						}
+
 					}
 					if (send(sock, &r, sizeof(r), 0) != sizeof(r)) break;
 					if (send(sock, &c, sizeof(c), 0) != sizeof(c)) break;				
