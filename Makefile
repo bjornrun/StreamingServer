@@ -12,14 +12,14 @@ ifeq ($(COMPILER), G++)
   else
     OBJ = o
   endif
-  COPT = -O2
+  COPT = -O2 -pthread
   CCMD = g++
   OBJFLAG = -o
   EXEFLAG = -o
 # INCLUDES = -I../.includes
   INCLUDES =
 # LIBS = -lgc
-  LIBS =
+  LIBS = -lpthread
 # LIBPATH = -L../gc/.libs
   LIBPATH =
   CPPFLAGS = $(COPT) -g $(INCLUDES)
